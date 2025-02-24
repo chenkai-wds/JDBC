@@ -30,7 +30,7 @@ public class JDBCUtilV2 {
                 connection = dataSource.getConnection();
                 threadLocal.set(connection);
             }
-            return dataSource.getConnection();
+            return connection;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
