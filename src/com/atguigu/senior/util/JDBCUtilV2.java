@@ -10,7 +10,7 @@ import java.util.Properties;
 
 public class JDBCUtilV2 {
     private static DataSource dataSource;
-
+    private static ThreadLocal<Connection> threadLocal = new ThreadLocal<>();
     static {
         try {
             Properties properties = new Properties();
@@ -25,15 +25,24 @@ public class JDBCUtilV2 {
 
     public static Connection getConnection() {
         try {
+            Connection connection = threadLocal.get();
+            if (connection == null) {
+                connection = dataSource.getConnection();
+                threadLocal.set(connection);
+            }
             return dataSource.getConnection();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static void release(Connection connection) {
+    public static void release() {
         try {
-            connection.close();
+            Connection connection = threadLocal.get();
+            if (connection != null) {
+                threadLocal.remove();
+                connection.close();
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
