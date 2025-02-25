@@ -1,13 +1,17 @@
 package com.atguigu.senior;
 
+import com.atguigu.senior.dao.BankDao;
 import com.atguigu.senior.dao.EmployeeDao;
+import com.atguigu.senior.dao.impl.BankDaoImpl;
 import com.atguigu.senior.dao.impl.EmployeeDaoImpl;
 import com.atguigu.senior.pojo.Employee;
 import com.atguigu.senior.util.JDBCUtil;
 import com.atguigu.senior.util.JDBCUtilV2;
 import org.junit.Test;
 
+import javax.swing.*;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 public class JDBCUtilTest {
@@ -63,5 +67,27 @@ public class JDBCUtilTest {
         //调用删除员工方法
         int delete = employeeDao.delete(8);
         System.out.println("delete = " + delete);
+    }
+
+    @Test
+    public void testTransaction() {
+        BankDao bankDao = new BankDaoImpl();
+        Connection connection = null;
+        try {
+            connection = JDBCUtilV2.getConnection();
+            connection.setAutoCommit(false);
+            bankDao.addMoney(1, 100);
+            bankDao.subMoney(2, 100);
+            connection.commit();
+        } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+        } finally {
+            JDBCUtilV2.release();
+        }
+
     }
 }

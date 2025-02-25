@@ -34,7 +34,9 @@ public class BaseDAO {
         int row = preparedStatement.executeUpdate();
         //释放资源
         preparedStatement.close();
-        JDBCUtilV2.release();
+        if (connection.getAutoCommit()) {
+            JDBCUtilV2.release();
+        }
         //返回结果
         return row;
     }
@@ -84,7 +86,9 @@ public class BaseDAO {
         }
         resultSet.close();
         preparedStatement.close();
-        JDBCUtilV2.release();
+        if (connection.getAutoCommit()) {
+            JDBCUtilV2.release();
+        }
         return list;
     }
 
